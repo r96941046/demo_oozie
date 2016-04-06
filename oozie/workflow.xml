@@ -1,5 +1,7 @@
 <workflow-app xmlns="uri:oozie:workflow:0.2" name="IisLogWorkflow">
+
     <start to="PrepareHive"/>
+
     <action name="PrepareHive">
         <hive xmlns="uri:oozie:hive-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -14,11 +16,26 @@
             <param>CLEANSED_TABLE=${cleansedTable}</param>
             <param>SUMMARY_TABLE=${summaryTable}</param>
         </hive>
+        <ok to="CleanseData"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="CleanseData">
+        <pig>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <script>${CleanseDataScript}</script>
+            <param>StagingFolder=${stagingFolder}</param>
+            <param>CleansedFolder=${cleansedFolder}</param>
+        </pig>
         <ok to="end"/>
         <error to="fail"/>
     </action>
+
     <kill name="fail">
         <message>Workflow failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
     <end name="end"/>
+
 </workflow-app>
