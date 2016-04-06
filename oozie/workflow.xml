@@ -32,7 +32,7 @@
         <error to="fail"/>
     </action>
 
-    <action name='CreateTables'>
+    <action name="CreateTables">
         <hive xmlns="uri:oozie:hive-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
@@ -47,6 +47,24 @@
             <param>CleansedFolder=${cleansedFolder}</param>
             <param>SUMMARY_TABLE=${summaryTable}</param>
             <param>SummaryFolder=${summaryFolder}</param>
+        </hive>
+        <ok to="SummarizeData"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="SummarizeData">
+        <hive xmlns="uri:oozie:hive-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <script>${SummarizeDataScript}</script>
+            <param>CLEANSED_TABLE=${cleansedTable}</param>
+            <param>SUMMARY_TABLE=${summaryTable}</param>
         </hive>
         <ok to="end"/>
         <error to="fail"/>
